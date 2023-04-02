@@ -1,2 +1,2 @@
 # AIPlanet-HackathonX
-Introducing HackathonX: a web platform for hosting/participating in hackathons. Hosts can create/post hackathons, manage entries; participants can enroll/submit code. Simple and efficient. Join us now!
+Welcome to HackathonX, a web-based platform for hosting and participating in hackathons. The platform allows authorized users to create and post hackathons with ease. Host users can add and edit details of the hackathon, as well as view and manage the submitted entries. On the other hand, participant users can enroll in hosted hackathons, submit their code or files, and view their entries. 
