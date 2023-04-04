@@ -1,0 +1,199 @@
+import axios from 'axios';
+import React, { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom';
+import { checkUser } from '../utils';
+import { Link } from 'react-router-dom';
+export default function DetailPage({ showAlert }) {
+
+    const [hackathon, setHackathon] = useState(null);
+    const [action, setAction] = useState('');
+    const [user, setUser] = useState('HOST');
+    const [enrolled, setEnrolled] = useState(false);
+
+    const { title } = useParams();
+
+    useEffect(() => {
+        async function runOnMount() {
+            const usertype = await checkUser();
+
+            setUser(usertype);
+            let result = [], enroll = false;
+            const config = {
+                headers: { Authorization: `Bearer ${localStorage.getItem('access')}` }
+            };
+            try {
+                const resp = await axios.get(`http://127.0.0.1:8000/api/hackathon/view?title=${title}`, config);
+                result = resp.data[0];
+            }
+            catch {
+                result = {};
+            }
+
+            try {
+                const resp = await axios.get(`http://127.0.0.1:8000/api/hackathon/view?title=${title}&me=true`, config);
+                enroll = resp.data.length > 0 && usertype === 'PARTICIPANT';
+            }
+            catch {
+                enroll = false;
+            }
+            setEnrolled(enroll);
+            setHackathon(result);
+        }
+        runOnMount();
+
+    }, [title]);
+
+    const performAction = async () => {
+        const config = {
+            headers: { Authorization: `Bearer ${localStorage.getItem('access')}` }
+        };
+        try {
+            if (action === 'delete') {
+                const resp = await axios.delete(`http://127.0.0.1:8000/api/hackathon/delete/${title}/`, config);
+
+
+                showAlert('danger', "Warning", `Hackathon {title} has been deleted!`);
+                setHackathon(null);
+            }
+            else if (action === 'enroll') {
+                const resp = await axios.post(`http://127.0.0.1:8000/api/hackathon/enroll/`, { hackathon: title }, config);
+
+                setEnrolled(true);
+                showAlert('success', "Application Status", "You have been enrolled to hackathon");
+            }
+
+
+
+        }
+        catch (error) {
+            let message = "";
+            for (const [key, value] of Object.entries(error.response.data)) {
+                message = message + `${key.toUpperCase()} : ${Array.isArray(value) ? value[0] : value}\n`;
+            }
+            showAlert('danger', "Error", message);
+        }
+
+    }
+
+
+
+    return (
+        <>
+            <div className="container-fluid" style={{ height: "100vh" }}>
+                <div className="row" style={{
+                    backgroundColor: "#003145",
+                    height: "45%",
+                    color: 'white'
+                }}>
+                    <div className="col-7 p-4">
+                        <div className="container pt-4" style={{ padding: '0rem 0rem 0rem 12rem', }}>
+
+
+                            <img style={{ maxHeight: '20vh' }} className='rounded shadow' src={`http://localhost:8000${hackathon?.hackathon_image}`} alt={title} />
+                            <span className='mx-4 display-3 fw-medium'>{title}</span>
+
+                            <div className="row my-2">
+                                <p >{hackathon?.description?.slice(0, 200) + " ..."}</p>
+                            </div>
+                            <span className='my-3 p-3 badge bg-dark-subtle text-black'>STARTS {new Date(hackathon?.created_at)?.toLocaleString()}</span>
+
+
+
+                        </div>
+
+                    </div>
+                    <div className="col-5 px-4">
+                        <div className="container pt-4 " style={{ padding: '10rem 0rem 4rem 12rem', }}>
+
+                            <div className="row p-4">
+                                <div className="col-12 my-4 text-center">
+                                    {
+                                        user === 'HOST' &&
+                                        <Link to={`/hackathon/${title}/edit`} type="button" className="m-4 btn btn-outline-light btn-lg "><i className="bi-pencil"> </i>  &nbsp;Edit Hackathon Details  </Link>
+                                    }
+                                    {
+                                        (user === 'PARTICIPANT' && enrolled)
+                                        &&
+                                        <Link to={`/submission/${title}/edit`} type="button" className="m-4 btn btn-outline-light btn-lg "><i className="bi-pencil"> </i>  &nbsp;Edit Submission  </Link>
+
+                                    }
+                                    {
+                                        (user === 'PARTICIPANT' && !enrolled)
+                                        &&
+                                        <button type="button" className="my-2 btn btn-outline-light btn-lg " data-bs-toggle="modal" data-bs-target="#staticBackdrop" onClick={() => { setAction('enroll'); }}><i className="bi-door-open" > </i> Enroll To Hackathon</button>
+                                    }
+
+
+                                </div>
+                                {user === 'HOST' &&
+                                    <div className="col-12 text-center">
+
+                                        <button type="button" className="my-2 btn btn-outline-light btn-lg " data-bs-toggle="modal" data-bs-target="#staticBackdrop" onClick={() => { setAction('delete'); }}><i className="bi-x-circle-fill"> </i> Delete Hackathon</button>
+
+                                    </div>
+                                }
+
+
+                            </div>
+
+
+
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div className="row">
+                    <div className="container">
+
+                        <div className="row">
+                            <div className="col-md-8 p-4">
+                                <h2 className='fw-medium'>Description</h2>
+                                <p>{hackathon?.description}</p>
+                            </div>
+                            <div className="col-md-4 p-4">
+                                <h3 className='fw-medium text-black-50'>Hackathon</h3>
+                                <h2 className='fw-medium'>{title}</h2>
+                                <p>
+                                    From&nbsp;&nbsp;
+                                    <span>{new Date(hackathon?.start_date)?.toLocaleString()}</span>&nbsp;&nbsp;to&nbsp;&nbsp;
+                                    <span>{new Date(hackathon?.end_date)?.toLocaleString()}</span>
+                                </p>
+
+
+                            </div>
+                        </div>
+
+                    </div>
+
+
+
+                </div>
+
+            </div >
+            <div className="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h1 className="modal-title fs-5" id="staticBackdropLabel">Information</h1>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div className="modal-body">
+                            This action is irreversible. It can't be undone in future.
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" className="btn btn-success" onClick={() => {
+                                performAction();
+                                setAction('');
+                            }}>Understood</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </>
+    )
+}
