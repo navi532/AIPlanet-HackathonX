@@ -499,7 +499,7 @@ URL: http://127.0.0.1:8000/api/hackathon/view
 
 
 ---
-[Back to top](#hackathonx)
+[Back to top](#aiplanet-hackathonx)
 
 # Contributing
 Contributions are welcome! Please open an issue or submit a pull request.
