@@ -120,7 +120,7 @@ class CreateSubmissionSerializer(serializers.Serializer):
 class EditSubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Submission
-        exclude = ("id", "hackathon", "user", "last_updated")
+        exclude = ("id", "hackathon", "user", "updated_at")
 
     def validate(self, attrs):
         submission_type = self.instance.hackathon.submission_type

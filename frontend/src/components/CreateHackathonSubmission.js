@@ -9,28 +9,50 @@ export default function CreateHackathonSubmission({ showAlert }) {
         description: "",
         background_image: '',
         hackathon_image: '',
-        start_date: null,
-        end_date: null,
+        start_date: '',
+        end_date: '',
         reward_prize: 0,
         submission_type: "LINK"
     });
 
     const navigate = useNavigate();
-    const handleChange = (e) => {
-        setHackathon({
-            ...hackathon,
-            [e.target.name]: e.target.value
-        })
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+        if (name === 'background_image' || name === 'hackathon_image') {
+            setHackathon({ ...hackathon, [name]: event.target.files[0] });
+        } else {
+            setHackathon({ ...hackathon, [name]: value });
+        }
     };
 
 
+
     const createHackathon = () => {
+        const formData = new FormData();
+        formData.append('title', hackathon.title);
+        formData.append('description', hackathon.description);
+        formData.append('start_date', hackathon.start_date);
+        formData.append('end_date', hackathon.end_date);
+        formData.append('reward_prize', hackathon.reward_prize);
+        formData.append('submission_type', hackathon.submission_type);
+
+        if (hackathon.background_image && !hackathon.background_image?.startsWith('/media')) {
+
+            formData.append('background_image', hackathon.background_image);
+        }
+
+        if (hackathon.hackathon_image && !hackathon.hackathon_image?.startsWith('/media')) {
+            formData.append('hackathon_image', hackathon.hackathon_image);
+        }
 
 
         const config = {
-            headers: { Authorization: `Bearer ${localStorage.getItem('access')}` }
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('access')}`,
+                'Content-Type': 'multipart/form-data'
+            }
         };
-        axios.post("http://127.0.0.1:8000/api/hackathon/create/", hackathon, config).then(resp => {
+        axios.post("http://127.0.0.1:8000/api/hackathon/create/", formData, config).then(resp => {
 
             showAlert('success', "Success", "Hackathon created");
             navigate(`/hackathon/${hackathon.title}`);
@@ -40,7 +62,8 @@ export default function CreateHackathonSubmission({ showAlert }) {
                 message = message + `${key.toUpperCase()} : ${Array.isArray(value) ? value[0] : value}\n`;
             }
             showAlert('danger', "Error", message);
-        })
+        });
+
 
     };
 
@@ -60,7 +83,7 @@ export default function CreateHackathonSubmission({ showAlert }) {
                 <form onSubmit={(e) => {
                     e.preventDefault();
                     createHackathon();
-                }}>
+                }} encType="multipart/form-data">
                     <div className="mb-3">
                         <label htmlFor="title" className="form-label">Title</label>
                         <input type="text" className="form-control" id="title" aria-describedby="emailHelp" onChange={handleChange} name='title' value={hackathon.title} required />
@@ -80,11 +103,11 @@ export default function CreateHackathonSubmission({ showAlert }) {
                     </div>
                     <div className="mb-3">
                         <label htmlFor="start_date" className="form-label">Start Date</label>
-                        <input type="date" className="form-control" id="start_date" onChange={handleChange} name='start_date' value={hackathon.start_date} required />
+                        <input type="datetime-local" className="form-control" id="start_date" onChange={handleChange} name='start_date' value={hackathon.start_date} required />
                     </div>
                     <div className="mb-3">
                         <label htmlFor="end_date" className="form-label">End Date</label>
-                        <input type="date" className="form-control" id="end_date" onChange={handleChange} name='end_date' value={hackathon.end_date} required />
+                        <input type="datetime-local" className="form-control" id="end_date" onChange={handleChange} name='end_date' value={hackathon.end_date} required />
                     </div>
                     <div className="mb-3">
                         <label htmlFor="reward" className="form-label">Reward Prize</label>

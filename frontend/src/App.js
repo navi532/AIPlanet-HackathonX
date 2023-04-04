@@ -53,16 +53,10 @@ function App() {
         <Alert alert={alert} />
 
         <Routes>
+
           <Route path="/login" element={<Login setIsLogged={setIsLogged} showAlert={showAlert} isLogged={isLogged} />} />
           <Route path="/signup" element={<Signup showAlert={showAlert} />} />
-          <Route
-            path="/"
-            element={
-              <Protected isLogged={isLogged}>
-                <Home />
-              </Protected>
-            }
-          />
+
           <Route
             path="/hackathon/create"
             element={
@@ -93,6 +87,14 @@ function App() {
               <Protected isLogged={isLogged} >
                 <DetailPage
                   showAlert={showAlert} />
+              </Protected>
+            }
+          />
+          <Route
+            path="/"
+            element={
+              <Protected isLogged={isLogged}>
+                <Home />
               </Protected>
             }
           />

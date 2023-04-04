@@ -15,22 +15,28 @@ export default function Home() {
 
 
 
-    const getHackathons = async () => {
 
-        const config = {
-            headers: { Authorization: `Bearer ${localStorage.getItem('access')}` }
-        };
-        try {
-            const resp = await axios.get(`http://127.0.0.1:8000/api/hackathon/view?me=${!isAll}&sortby=${sort}`, config);
-            setHackathons(resp.data);
+    useEffect(() => {
+        const getHackathons = async () => {
 
-        }
-        catch {
             setHackathons([]);
+            setLoading(true);
+            const config = {
+                headers: { Authorization: `Bearer ${localStorage.getItem('access')}` }
+            };
+            try {
+                const resp = await axios.get(`http://127.0.0.1:8000/api/hackathon/view?me=${!isAll}&sortby=${sort}`, config);
+                setHackathons(resp.data);
 
+            }
+            catch {
+                setHackathons([]);
+
+            }
+            setLoading(false);
         }
-        setLoading(false);
-    }
+        getHackathons();
+    }, [isAll, sort]);
 
     useEffect(() => {
         async function runOnMount() {
@@ -95,27 +101,20 @@ export default function Home() {
                                     <li className="nav-item ">
                                         <button className={"nav-link text-black " + (isAll && "active")} onClick={() => {
                                             setIsAll(true);
-                                            setHackathons([]);
-                                            setLoading(true);
-                                            getHackathons();
                                         }}>All Submissions</button>
                                     </li>
                                     <li className="nav-item">
                                         <button className={"nav-link text-black " + (!isAll && "active")} onClick={() => {
                                             setIsAll(false);
-                                            setHackathons([]);
-                                            setLoading(true);
-                                            getHackathons();
                                         }}>{user === "HOST" ? "Created by Me" : "Enrolled Hackathons"}</button>
                                     </li>
                                     <form className="d-flex justify-content-end" role="search">
-                                        <select className="form-select form-select-lg mb-3" aria-label=".form-select-lg example" onChange={(e) => {
+                                        <select className="form-select form-select-lg mb-3" aria-label=".form-select-lg example" value={sort} onChange={(e) => {
 
                                             setSort(e.target.value);
-                                            getHackathons();
                                         }}>
-                                            <option value="oldest" selected={sort === 'newest'}>Order By Oldest</option>
-                                            <option value="newest" selected={sort === 'newest'}>Order By Newest</option>
+                                            <option value="oldest" >Order By Oldest</option>
+                                            <option value="newest" >Order By Newest</option>
                                         </select>
                                     </form>
                                 </ul>

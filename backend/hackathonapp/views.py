@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from .permissions import IsAuthenticatedHost, IsAuthenticatedParticipant
 from .serializers import *
 from django.http import Http404
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
 # Create your views here.
@@ -25,6 +26,7 @@ class ParticipantCheckView(APIView):
 
 class HackathonAPIView(APIView):
     permission_classes = [IsAuthenticatedHost]
+    parser_classes = [MultiPartParser, FormParser]
 
     def get_permissions(self):
         if self.request.method == "GET":
@@ -120,6 +122,7 @@ class HackathonAPIView(APIView):
             return Response(
                 {"message": "Resource Not Found"}, status=status.HTTP_400_BAD_REQUEST
             )
+
         serializer = self.get_serializer_class()(
             instance=hackathon, data=request.data, partial=True
         )
@@ -152,6 +155,7 @@ class HackathonAPIView(APIView):
 
 class SubmissionAPIView(APIView):
     permission_classes = [IsAuthenticatedParticipant]
+    parser_classes = [MultiPartParser, FormParser]
 
     def get_permissions(self):
         if self.request.method == "GET":
