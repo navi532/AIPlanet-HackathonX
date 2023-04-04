@@ -87,8 +87,9 @@ class CreateSubmissionSerializer(serializers.Serializer):
         title = attrs.get("hackathon")
         try:
             hackathon = Hackathon.objects.get(title=title)
+
             submission = Submission.objects.get(
-                hackathon=hackathon, user=self.context["user"]
+                hackathon=hackathon, user=self.context.get("user")
             )
             raise serializers.ValidationError({"message": "User is already enrolled"})
 
@@ -96,6 +97,8 @@ class CreateSubmissionSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 {"hackathon": "No such hackathon exists!"}
             )
+        except serializers.ValidationError as e:
+            raise e
         except:
             pass
 

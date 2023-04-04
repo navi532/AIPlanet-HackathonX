@@ -61,13 +61,16 @@ class HackathonAPIView(APIView):
             params["title"] = request.query_params.get("title")
 
         if request.query_params.get("me", "false").lower() == "true":
-            params["owner"] = request.user
+            if request.user.is_staff:
+                params["owner"] = request.user
+            else:
+                params["submission__user"] = request.user
 
         queryset = Hackathon.objects.filter(**params).order_by("?")  # Random each time
         if request.query_params.get("sortby") == "oldest":
-            queryset = queryset.order_by("created_at")
+            queryset = queryset.order_by("start_date")
         elif request.query_params.get("sortby") == "newest":
-            queryset = queryset.order_by("-created_at")
+            queryset = queryset.order_by("-start_date")
         serializer = self.get_serializer_class()(queryset, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
