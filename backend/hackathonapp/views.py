@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from .permissions import IsAuthenticatedHost, IsAuthenticatedParticipant
 from .serializers import *
 from django.http import Http404
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 
 # Create your views here.
@@ -26,7 +26,7 @@ class ParticipantCheckView(APIView):
 
 class HackathonAPIView(APIView):
     permission_classes = [IsAuthenticatedHost]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def get_permissions(self):
         if self.request.method == "GET":
@@ -155,7 +155,7 @@ class HackathonAPIView(APIView):
 
 class SubmissionAPIView(APIView):
     permission_classes = [IsAuthenticatedParticipant]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def get_permissions(self):
         if self.request.method == "GET":
