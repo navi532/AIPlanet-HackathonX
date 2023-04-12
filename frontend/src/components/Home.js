@@ -101,7 +101,7 @@ export default function Home() {
                                     <li className="nav-item ">
                                         <button className={"nav-link text-black " + (isAll && "active")} onClick={() => {
                                             setIsAll(true);
-                                        }}>All Submissions</button>
+                                        }}>All Hackathons</button>
                                     </li>
                                     <li className="nav-item">
                                         <button className={"nav-link text-black " + (!isAll && "active")} onClick={() => {
