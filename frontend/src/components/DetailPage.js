@@ -206,6 +206,10 @@ export default function DetailPage({ showAlert }) {
                                             <span>{new Date(hackathon?.start_date)?.toLocaleString()}</span>to
                                             <span>{new Date(hackathon?.end_date)?.toLocaleString()}</span>
                                         </p>
+                                        <p>
+                                            Reward
+                                            <b>${hackathon?.reward_prize}</b>
+                                        </p>
 
 
                                     </div>
